@@ -8,7 +8,7 @@
 
 - conda环境：gradio_crystal3d
 - 使用npm时，需要首先将目录`/home/huangyike/soft/node-v18.19.0-linux-x64/bin`添加到PATH，从而可以使用`npm`, `node`等命令
-- Python的可执行文件需要参考conda环境来设置，即`/home/huangyike/anaconda3/envs/gradio_crystal3d/bin/python`
+- Python的可执行文件需要参考conda环境来设置，即`/home/huangyike/.conda/envs/gradio_crystal3d/bin/python`
 
 ## 当前状态分析
 

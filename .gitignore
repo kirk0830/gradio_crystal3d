@@ -37,3 +37,6 @@ tests/__pycache__/
 
 # Root package-lock.json (frontend has its own)
 /package-lock.json
+
+# Trae IDE cache files
+.trae/
