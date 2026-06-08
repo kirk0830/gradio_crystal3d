@@ -57,13 +57,15 @@ def update_viewer(
     gr.HTML
         Updated Crystal3D viewer component
     """
-    if file is not None and hasattr(file, 'name'):
-        cif_path = Path(file.name)
-    else:
-        cif_path = here / "Si_mp-149.cif"
+    if isinstance(file, str):
+        file = Path(file)
+    if file is None:
+        file = here / "Si_mp-149.cif"
+    if isinstance(file, gr.File):
+        file = file.name
 
     return create_crystal3d_viewer(
-        value=cif_path,
+        value=file,
         style_type=style,
         show_unit_cell=unit_cell,
         show_hydrogen=hydrogen,

@@ -151,7 +151,6 @@ class Crystal3D(Component):
             content = ""
 
         viewer_id = hash(content) % 10000
-        cif_b64 = base64.b64encode(content.encode()).decode()
 
         unit_cell_code = (
             "viewer.addUnitCell();" if self.show_unit_cell else ""
@@ -181,7 +180,7 @@ class Crystal3D(Component):
                     backgroundColor: 'white'
                 }});
 
-                var cifData = atob("{cif_b64}");
+                var cifData = `{content}`;
                 viewer.addModel(cifData, 'cif', {{doAssembly: true}});
 
                 {unit_cell_code}
