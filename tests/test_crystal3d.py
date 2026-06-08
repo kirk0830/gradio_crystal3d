@@ -34,7 +34,7 @@ def create_test_app() -> gr.Blocks:
         Gradio Blocks app with Crystal3D viewer preloaded with Si example
     """
     cif_path = (
-        Path(__file__).parent.parent.parent
+        Path(__file__).parent.parent
         / "examples"
         / "Si_mp-149.cif"
     )
