@@ -17,7 +17,6 @@ Features:
 
 Usage:
     python examples/example_crystal3d.py
-    Then visit http://localhost:8002
 """
 
 import sys
@@ -26,9 +25,9 @@ from typing import Optional
 
 import gradio as gr
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "crystal3d" / "backend"))
+sys.path.insert(0, str(Path(__file__).parent.parent / "backend"))
 
-from gradio_crystal3d import create_crystal3d_viewer
+from gradio_crystal3d import Crystal3D, create_crystal3d_viewer
 
 here = Path(__file__).parent
 
@@ -38,7 +37,7 @@ def update_viewer(
     style: str,
     unit_cell: bool,
     hydrogen: bool,
-) -> gr.HTML:
+    ) -> gr.HTML:
     """
     Update the crystal viewer based on user inputs.
 
@@ -58,7 +57,7 @@ def update_viewer(
     gr.HTML
         Updated Crystal3D viewer component
     """
-    if file is not None:
+    if file is not None and hasattr(file, 'name'):
         cif_path = Path(file.name)
     else:
         cif_path = here / "Si_mp-149.cif"
@@ -132,10 +131,7 @@ with gr.Blocks(title="Crystal3D Example") as demo:
                     show_unit_cell=True,
                     show_hydrogen=True,
                 )
-                viewer = gr.HTML(
-                    initial_viewer.value,
-                    label="3D Visualization",
-                )
+                viewer = initial_viewer
 
     cif_file.change(
         fn=update_viewer,
@@ -183,5 +179,5 @@ with gr.Blocks(title="Crystal3D Example") as demo:
 
 if __name__ == "__main__":
     print("Starting Crystal3D Example Application...")
-    print("Visit http://localhost:8002 to use the application.")
-    demo.launch(server_name="localhost", server_port=8002)
+    print("Visit http://localhost:7860 to use the application.")
+    demo.launch(server_name="localhost", server_port=7860)

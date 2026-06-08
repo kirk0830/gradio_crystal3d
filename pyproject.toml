@@ -10,7 +10,7 @@ readme = "README.md"
 license = {text = "GPL-3.0"}
 requires-python = ">=3.10"
 authors = [
-    {name = "huangyike", email = "huangyike@example.com"},
+    {name = "YOUR_NAME", email = "YOUR_EMAIL@example.com"},
 ]
 keywords = ["gradio", "custom-component", "crystal", "cif", "3dmol", "visualization"]
 classifiers = [
@@ -35,14 +35,10 @@ Issues = "https://github.com/kirk0830/gradio_crystal3d/issues"
 
 [tool.hatch.build]
 artifacts = [
-    "backend/gradio_crystal3d/templates/**/*",
-    "backend/gradio_crystal3d/*.pyi",
+    "backend/gradio_crystal3d/templates",
+    "*.pyi",
+    "frontend/dist/**/*",
 ]
 
 [tool.hatch.build.targets.wheel]
 packages = ["backend/gradio_crystal3d"]
-include = [
-    "**/*.py",
-    "**/*.pyi",
-    "**/templates/**/*",
-]

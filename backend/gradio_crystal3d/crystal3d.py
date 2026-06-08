@@ -13,6 +13,7 @@ Features:
     - Interactive 3D rotation and zoom
 """
 
+import base64
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -38,6 +39,19 @@ class Crystal3D(Component):
         style_type (str): Rendering style ('ball+stick', 'sphere', or 'stick')
         show_unit_cell (bool): Whether to display unit cell boundary
         show_hydrogen (bool): Whether to display hydrogen atoms
+
+    Example:
+        >>> import gradio as gr
+        >>> from gradio_crystal3d import Crystal3D
+        >>> demo = gr.Blocks()
+        >>> with demo:
+        ...     crystal = Crystal3D(
+        ...         value="path/to/structure.cif",
+        ...         style_type="ball+stick",
+        ...         show_unit_cell=True,
+        ...         show_hydrogen=True,
+        ...     )
+        >>> demo.launch()
     """
 
     EVENTS = ["change"]
@@ -117,6 +131,83 @@ class Crystal3D(Component):
             key=key,
         )
 
+    def generate_html(self, cif_content: Optional[str] = None) -> str:
+        """
+        Generate HTML content with embedded 3Dmol.js viewer.
+
+        Parameters
+        ----------
+        cif_content : Optional[str]
+            CIF file content string. If None, uses the component's value.
+
+        Returns
+        -------
+        str
+            HTML string containing the 3Dmol.js viewer
+        """
+        content = cif_content if cif_content is not None else self.value
+
+        if content is None:
+            content = ""
+
+        viewer_id = hash(content) % 10000
+        cif_b64 = base64.b64encode(content.encode()).decode()
+
+        unit_cell_code = (
+            "viewer.addUnitCell();" if self.show_unit_cell else ""
+        )
+        sphere_code = (
+            "style.sphere = {scale: 0.3};"
+            if self.style_type == "ball+stick" or self.style_type == "sphere"
+            else ""
+        )
+        stick_code = (
+            "style.stick = {radius: 0.15};"
+            if self.style_type == "ball+stick" or self.style_type == "stick"
+            else ""
+        )
+        hydrogen_code = "true" if self.show_hydrogen else "false"
+
+        html_content = f"""
+    <div style="width: 100%; height: 400px; border: 1px solid #e5e7eb;
+    border-radius: 8px; overflow: hidden; position: relative;">
+        <div id="crystal_viewer_{viewer_id}"
+        style="width: 100%; height: 100%;"></div>
+        <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+        <script>
+            (function() {{
+                var viewer = $3Dmol.createViewer('crystal_viewer_{viewer_id}', {{
+                    defaultcolors: $3Dmol.elementColors.Jmol,
+                    backgroundColor: 'white'
+                }});
+
+                var cifData = atob("{cif_b64}");
+                viewer.addModel(cifData, 'cif', {{doAssembly: true}});
+
+                {unit_cell_code}
+
+                var style = {{}};
+                {sphere_code}
+                {stick_code}
+                viewer.setStyle({{}}, style);
+
+                if ({hydrogen_code}) {{
+                    viewer.setStyle(
+                        {{elem: 'H'}},
+                        {{sphere: {{scale: 0.15}}, stick: {{radius: 0.1}}}}
+                    );
+                }} else {{
+                    viewer.setStyle({{elem: 'H'}}, {{hide: true}});
+                }}
+
+                viewer.zoomTo();
+                viewer.render();
+            }})();
+        </script>
+    </div>
+    """
+        return html_content
+
     def preprocess(self, x: Optional[str]) -> Optional[str]:
         """
         Pass through CIF string from frontend.
@@ -152,10 +243,12 @@ class Crystal3D(Component):
         if isinstance(x, Path):
             return x.read_text(encoding="utf-8")
         if isinstance(x, str):
-            if "\n" not in x and Path(x).exists():
-                return Path(x).read_text(encoding="utf-8")
+            if "\n" not in x:
+                path = Path(x)
+                if path.exists():
+                    return path.read_text(encoding="utf-8")
             return x
-        return str(x)
+        raise TypeError(f"Expected str, Path, or None, got {type(x).__name__}")
 
     def example_inputs(self) -> Dict[str, str | bool]:
         """
@@ -211,10 +304,13 @@ def create_crystal3d_viewer(
     show_unit_cell: bool = True,
     show_hydrogen: bool = True,
     container: bool = True,
-    **kwargs
-    ) -> gr.HTML:
+    **kwargs,
+) -> gr.HTML:
     """
     Create a crystal structure viewer using gr.HTML.
+
+    This is a convenience function that creates a Crystal3D instance
+    and generates the corresponding HTML for visualization.
 
     Parameters
     ----------
@@ -248,8 +344,6 @@ def create_crystal3d_viewer(
     ValueError
         If style_type is not a valid option
     """
-    import base64
-
     assert style_type in ("ball+stick", "sphere", "stick"), (
         f"style_type must be 'ball+stick', 'sphere', or 'stick', "
         f"got '{style_type}'"
@@ -262,69 +356,18 @@ def create_crystal3d_viewer(
             raise FileNotFoundError(f"CIF file not found: {cif_path}")
         cif_content = cif_path.read_text(encoding="utf-8")
 
-    cif_b64 = base64.b64encode(cif_content.encode()).decode()
-
-    unit_cell_code = (
-        "viewer.addUnitCell();" if show_unit_cell else ""
+    crystal = Crystal3D(
+        style_type=style_type,
+        show_unit_cell=show_unit_cell,
+        show_hydrogen=show_hydrogen,
     )
-    sphere_code = (
-        "style.sphere = {scale: 0.3};"
-        if style_type == "ball+stick" or style_type == "sphere"
-        else ""
-    )
-    stick_code = (
-        "style.stick = {radius: 0.15};"
-        if style_type == "ball+stick" or style_type == "stick"
-        else ""
-    )
-    hydrogen_code = "true" if show_hydrogen else "false"
 
-    html_content = f"""
-    <div style="width: 100%; height: 400px; border: 1px solid #e5e7eb;
-    border-radius: 8px; overflow: hidden;">
-        <script src="https://cdn.jsdelivr.net/npm/3dmol@2.0.0/build/3Dmol-min.js"></script>
-        <div id="crystal_viewer_{hash(cif_content) % 10000}"
-        style="width: 100%; height: 100%;"></div>
-        <script>
-            (function() {{
-                let viewer = $3Dmol.createViewer(
-                    'crystal_viewer_{hash(cif_content) % 10000}',
-                    {{
-                        defaultcolors: $3Dmol.elementColors.rasmol,
-                        backgroundColor: 'white'
-                    }}
-                );
-
-                let cifData = atob("{cif_b64}");
-                viewer.addModel(cifData, 'cif', {{doAssembly: true}});
-
-                {unit_cell_code}
-
-                let style = {{}};
-                {sphere_code}
-                {stick_code}
-                viewer.setStyle({{}}, style);
-
-                if ({hydrogen_code}) {{
-                    viewer.setStyle(
-                        {{elem: 'H'}},
-                        {{sphere: {{scale: 0.15}}, stick: {{radius: 0.1}}}}
-                    );
-                }} else {{
-                    viewer.setStyle({{elem: 'H'}}, {{hide: true}});
-                }}
-
-                viewer.zoomTo();
-                viewer.render();
-            }})();
-        </script>
-    </div>
-    """
+    html_content = crystal.generate_html(cif_content)
 
     return gr.HTML(
         html_content,
         label=label,
         show_label=show_label,
         container=container,
-        **kwargs
+        **kwargs,
     )
