@@ -1,0 +1,48 @@
+[build-system]
+requires = ["hatchling", "hatch-requirements-txt", "hatch-nodejs-version"]
+build-backend = "hatchling.build"
+
+[project]
+name = "gradio_crystal3d"
+version = "0.0.1"
+description = "Gradio Custom Component for interactive 3D crystal structure visualization from CIF files"
+readme = "README.md"
+license = {text = "GPL-3.0"}
+requires-python = ">=3.10"
+authors = [
+    {name = "huangyike", email = "huangyike@example.com"},
+]
+keywords = ["gradio", "custom-component", "crystal", "cif", "3dmol", "visualization"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+dependencies = [
+    "gradio>=5.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/kirk0830/gradio_crystal3d"
+Repository = "https://github.com/kirk0830/gradio_crystal3d"
+Issues = "https://github.com/kirk0830/gradio_crystal3d/issues"
+
+[tool.hatch.build]
+artifacts = [
+    "backend/gradio_crystal3d/templates/**/*",
+    "backend/gradio_crystal3d/*.pyi",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["backend/gradio_crystal3d"]
+include = [
+    "**/*.py",
+    "**/*.pyi",
+    "**/templates/**/*",
+]

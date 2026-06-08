@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+eggs/
+*.egg-info/
+
+# Node.js
+frontend/node_modules/
+frontend/.svelte-kit/
+
+# BUT KEEP build artifacts for pip install!
+!frontend/dist/
+!backend/gradio_crystal3d/templates/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts (keep dist/ directory but ignore contents)
+dist/*.whl
+dist/*.tar.gz
+
+# Test cache
+tests/__pycache__/
+
+# Root package-lock.json (frontend has its own)
+/package-lock.json
