@@ -1,14 +1,9 @@
-from __future__ import annotations
+"""Type stubs for gradio_crystal3d module."""
 
-from collections.abc import Callable, Sequence
-from typing import TYPE_CHECKING, Any, Literal
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
-from gradio.components.base import Component, FormComponent
-from gradio.events import Events
-from gradio.i18n import I18nData
-
-if TYPE_CHECKING:
-    from gradio.components import Timer
+from gradio.components.base import Component
 
 
 class Crystal3D(Component):
@@ -154,47 +149,46 @@ class Crystal3D(Component):
         hydrogen_code = "true" if self.show_hydrogen else "false"
 
         html = f"""
-            <div style="width: 100%; 
-                        height: 400px; 
-                        border: 1px solid #e5e7eb;
-                        border-radius: 8px; 
-                        overflow: hidden; 
-                        position: relative;">
-            <div id="crystal_viewer_{viewer_id}"
-                 style="width: 100%; height: 100%;"></div>
-        """
+<div style="width: 100%; 
+            height: 400px; 
+            border: 1px solid #e5e7eb;
+            border-radius: 8px; 
+            overflow: hidden; 
+            position: relative;">
+<div id="crystal_viewer_{viewer_id}"
+     style="width: 100%; height: 100%;"></div>
+</div>
+"""
 
-        js = f"""
-            let myViewer = function() {{
-                var viewer = $3Dmol.createViewer('crystal_viewer_{viewer_id}', {{
-                    defaultcolors: $3Dmol.elementColors.Jmol,
-                    backgroundColor: 'white'
-                }});
+        js = f"""let myViewer = function() {{
+    var viewer = $3Dmol.createViewer('crystal_viewer_{viewer_id}', {{
+        defaultcolors: $3Dmol.elementColors.Jmol,
+        backgroundColor: 'white'
+    }});
 
-                var cifData = `{content}`;
-                viewer.addModel(cifData, 'cif', {{doAssembly: true}});
+    var cifData = `{content}`;
+    viewer.addModel(cifData, 'cif', {{doAssembly: true}});
 
-                {unit_cell_code}
+    {unit_cell_code}
 
-                var style = {{}};
-                {sphere_code}
-                {stick_code}
-                viewer.setStyle({{}}, style);
+    var style = {{}};
+    {sphere_code}
+    {stick_code}
+    viewer.setStyle({{}}, style);
 
-                if ({hydrogen_code}) {{
-                    viewer.setStyle(
-                        {{elem: 'H'}},
-                        {{sphere: {{scale: 0.15}}, stick: {{radius: 0.1}}}}
-                    );
-                }} else {{
-                    viewer.setStyle({{elem: 'H'}}, {{hide: true}});
-                }}
+    if ({hydrogen_code}) {{
+        viewer.setStyle(
+            {{elem: 'H'}},
+            {{sphere: {{scale: 0.15}}, stick: {{radius: 0.1}}}}
+        );
+    }} else {{
+        viewer.setStyle({{elem: 'H'}}, {{hide: true}});
+    }}
 
-                viewer.zoomTo();
-                viewer.render();
-            }};
-            myViewer();
-        """
+    viewer.zoomTo();
+    viewer.render();
+}};
+myViewer();"""
         return html, js
 
     def preprocess(self, x: Optional[str]) -> Optional[str]:
@@ -342,3 +336,16 @@ class Crystal3D(Component):
         
         """
         ...
+
+
+def create_crystal3d_viewer(
+    value: Optional[str | Path] = None,
+    label: Optional[str] = "Crystal Structure",
+    show_label: bool = True,
+    style_type: str = "ball+stick",
+    show_unit_cell: bool = True,
+    show_hydrogen: bool = True,
+    container: bool = True,
+    **kwargs: Any,
+) -> Any:
+    ...
