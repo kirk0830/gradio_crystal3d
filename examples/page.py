@@ -124,50 +124,46 @@ with gr.Blocks(title="Crystal3D Example") as demo:
         with gr.Column(scale=2):
             gr.Markdown("### Crystal Structure Viewer")
             default_cif = here / "Si_mp-149.cif"
-            viewer = gr.HTML(label="3D Visualization")
-
-            if default_cif.exists():
-                initial_viewer = create_crystal3d_viewer(
+            viewer = create_crystal3d_viewer(
                     value=default_cif,
                     style_type="ball+stick",
                     show_unit_cell=True,
                     show_hydrogen=True,
-                )
-                viewer = initial_viewer
+                ) if default_cif.exists() else gr.HTML(label="3D Visualization")
 
-    cif_file.change(
-        fn=update_viewer,
-        inputs=[cif_file, style_type, show_unit_cell, show_hydrogen],
-        outputs=viewer,
-    )
+    # cif_file.change(
+    #     fn=update_viewer,
+    #     inputs=[cif_file, style_type, show_unit_cell, show_hydrogen],
+    #     outputs=viewer,
+    # )
 
-    style_type.change(
-        fn=update_viewer,
-        inputs=[cif_file, style_type, show_unit_cell, show_hydrogen],
-        outputs=viewer,
-    )
+    # style_type.change(
+    #     fn=update_viewer,
+    #     inputs=[cif_file, style_type, show_unit_cell, show_hydrogen],
+    #     outputs=viewer,
+    # )
 
-    show_unit_cell.change(
-        fn=update_viewer,
-        inputs=[cif_file, style_type, show_unit_cell, show_hydrogen],
-        outputs=viewer,
-    )
+    # show_unit_cell.change(
+    #     fn=update_viewer,
+    #     inputs=[cif_file, style_type, show_unit_cell, show_hydrogen],
+    #     outputs=viewer,
+    # )
 
-    show_hydrogen.change(
-        fn=update_viewer,
-        inputs=[cif_file, style_type, show_unit_cell, show_hydrogen],
-        outputs=viewer,
-    )
+    # show_hydrogen.change(
+    #     fn=update_viewer,
+    #     inputs=[cif_file, style_type, show_unit_cell, show_hydrogen],
+    #     outputs=viewer,
+    # )
 
-    load_default.click(
-        fn=lambda: create_crystal3d_viewer(
-            value=default_cif if default_cif.exists() else None,
-            style_type="ball+stick",
-            show_unit_cell=True,
-            show_hydrogen=True,
-        ),
-        outputs=viewer,
-    )
+    # load_default.click(
+    #     fn=lambda: create_crystal3d_viewer(
+    #         value=default_cif if default_cif.exists() else None,
+    #         style_type="ball+stick",
+    #         show_unit_cell=True,
+    #         show_hydrogen=True,
+    #     ),
+    #     outputs=viewer,
+    # )
 
     gr.Markdown("---")
     gr.Markdown("""

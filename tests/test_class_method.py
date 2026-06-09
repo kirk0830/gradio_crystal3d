@@ -22,8 +22,9 @@ if cif_path.exists():
     )
 
     print("\n1. Testing Crystal3D.generate_html():")
-    html_content = crystal.generate_html()
-    print(f"   HTML generated successfully, length: {len(html_content)} chars")
+    html, viewerjs = crystal.generate_html()
+    print(f"   HTML generated successfully, length: {len(html)} chars")
+    print(f"   JavaScript generated successfully, length: {len(viewerjs)} chars")
 
     # Test create_crystal3d_viewer convenience function
     print("\n2. Testing create_crystal3d_viewer():")

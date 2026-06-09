@@ -57,7 +57,7 @@ def create_test_app() -> gr.Blocks:
         )
 
         gr.Markdown("### Crystal Structure Viewer")
-        create_crystal3d_viewer(
+        viewer = create_crystal3d_viewer(
             value=cif_path,
             label="Silicon (Diamond Structure)",
             style_type="ball+stick",
@@ -73,37 +73,5 @@ def create_test_app() -> gr.Blocks:
 
     return demo
 
-
-def create_fastapi_app() -> FastAPI:
-    """
-    Create FastAPI app with mounted Gradio demo.
-
-    Returns
-    -------
-    FastAPI
-        FastAPI application with Crystal3D Gradio interface
-    """
-    app = FastAPI(title="Crystal3D Test API", version="1.0")
-    demo = create_test_app()
-    app = gr.mount_gradio_app(app, demo, path="/")
-    return app
-
-
 if __name__ == "__main__":
-    print("=" * 60)
-    print("Crystal3D Integration Test")
-    print("=" * 60)
-
-    import uvicorn
-
-    app = create_fastapi_app()
-    print("\nApplication created successfully!")
-    print("\nStarting server on http://localhost:8001")
-    print("Press Ctrl+C to stop the server.\n")
-
-    uvicorn.run(
-        app,
-        host="0.0.0.0",
-        port=8001,
-        log_level="info",
-    )
+    create_test_app().launch()

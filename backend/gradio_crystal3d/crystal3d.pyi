@@ -115,7 +115,7 @@ class Crystal3D(Component):
             key=key,
         )
 
-    def generate_html(self, cif_content: Optional[str] = None) -> str:
+    def generate_html(self, cif_content: Optional[str] = None) -> Tuple[str, str]:
         """
         Generate HTML content with embedded 3Dmol.js viewer.
 
@@ -126,8 +126,10 @@ class Crystal3D(Component):
 
         Returns
         -------
-        str
-            HTML string containing the 3Dmol.js viewer
+        Tuple[str, str]
+            Tuple containing the HTML string and the scripts should be loaded
+            when the component is rendered (should be passed to the `js_on_load`
+            parameter of `gr.HTML`)
         """
         content = cif_content if cif_content is not None else self.value
 
@@ -151,14 +153,19 @@ class Crystal3D(Component):
         )
         hydrogen_code = "true" if self.show_hydrogen else "false"
 
-        html_content = f"""
-    <div style="width: 100%; height: 400px; border: 1px solid #e5e7eb;
-    border-radius: 8px; overflow: hidden; position: relative;">
-        <div id="crystal_viewer_{viewer_id}"
-        style="width: 100%; height: 100%;"></div>
-        <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
-        <script>
-            (function() {{
+        html = f"""
+            <div style="width: 100%; 
+                        height: 400px; 
+                        border: 1px solid #e5e7eb;
+                        border-radius: 8px; 
+                        overflow: hidden; 
+                        position: relative;">
+            <div id="crystal_viewer_{viewer_id}"
+                 style="width: 100%; height: 100%;"></div>
+        """
+
+        js = f"""
+            let myViewer = function() {{
                 var viewer = $3Dmol.createViewer('crystal_viewer_{viewer_id}', {{
                     defaultcolors: $3Dmol.elementColors.Jmol,
                     backgroundColor: 'white'
@@ -185,11 +192,10 @@ class Crystal3D(Component):
 
                 viewer.zoomTo();
                 viewer.render();
-            }})();
-        </script>
-    </div>
-    """
-        return html_content
+            }};
+            myViewer();
+        """
+        return html, js
 
     def preprocess(self, x: Optional[str]) -> Optional[str]:
         """
